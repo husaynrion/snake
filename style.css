@@ -1,0 +1,56 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body{
+    height: 100vh;
+    width: 100%;
+}
+.flex{
+    display: flex;
+}
+#box{
+    position: relative;
+    top: 100px;
+    left: 100px;
+    height: 204px;
+    width: 204px;
+    background-color: #333;
+    border: 2px solid rgb(255, 153, 0);
+}
+#body0{
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    background-color: rgb(0, 183, 255);
+    top: 0px;
+    left: 0px;
+}
+#food{
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    background-color: rgb(248, 66, 66);
+    top: 100px;
+    left: 100px;
+}
+.body{
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    background-color: rgb(0, 247, 255);
+    border: 1px solid black;
+}
+p{
+    position: absolute;
+    top: 10px;
+    left: 100px;
+    font-size: 30px;
+}
+span{
+    background-color: rgb(255, 1, 1);
+    color: white;
+    padding: 0px 10px;
+    font-weight: bold;
+}
