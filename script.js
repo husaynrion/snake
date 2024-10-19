@@ -1,10 +1,15 @@
-var head = document.getElementById("cellNumber0");
-var food = document.getElementById("food");
 var lastSwipe, swipe, lastKey, key, headX = 0, headY= 0, foodX = 100, foodY = 100, bodySize = 1, containerWidth = 700, containerHeight = 800;
 var button = document.getElementById("button");
 var score = document.getElementById("score");
+score.innerHTML = "0";
+var container = document.getElementById("container");
+var head = document.getElementById("headCell");
+head.style.left = "0px";
+head.style.top = "0px";
+var food = document.getElementById("food");
 
-function pause()
+
+function changeButtonState()
 {
     if (button.innerHTML == "Pause")
     {
@@ -19,14 +24,18 @@ function pause()
         button.style.color = "#000";
     }
 }
-var id = setInterval(frame, 120);
+
+var id = setInterval(frame, 100);
+var gameOver = false;
+
+var arrayOfCells = [head];
+
 function frame()
 {
-    var gameOver = false;
 
     for (var i = 1; i < bodySize; i++)
     {
-        var nthCell = document.getElementById("cellNumber" + i);
+        var nthCell = arrayOfCells[i];
 
         if ( nthCell.style.left == head.style.left && nthCell.style.top == head.style.top )
         {
@@ -44,24 +53,19 @@ function frame()
     }
     else
     {
-        if (button.innerHTML == "Pause")
+        if (button.innerHTML == "Pause") // It means the game is going on.
         {
-            var cellPositionsX = [], cellPositionsY = [];
-            for (var i = 0; i < bodySize; i++)
-            {
-                var cellX = document.getElementById("cellNumber" + i).style.left;
-                var cellY = document.getElementById("cellNumber" + i).style.top;
-                cellPositionsX[i] = cellX;
-                cellPositionsY[i] = cellY;
-            }
+            var lastPositionOfHead = {x:head.style.left, y:head.style.top}; // We are gonna turn the snake. We better store its current head position to pass it to the next cell;
 
+            //////// LOGIC FOR TURNING (START) ///////////////
+            {
+                
             ////////////// For PC //////////////
             document.onkeydown = checkKey;
 
             lastKey = key;
             function checkKey(e)
             {
-                e = e || window.event;
 
                 if (e.keyCode == '38' && lastKey != "bottom")
                 {
@@ -80,7 +84,8 @@ function frame()
                     key = "left";
                 }
             }
-
+            
+            ////////////// For Mobile //////////////
             document.addEventListener('touchstart', handleTouchStart, false);
             document.addEventListener('touchmove', handleTouchMove, false);
 
@@ -145,8 +150,6 @@ function frame()
             };
 
 
-
-
             if (swipe == "top" || key == "top")
             {
                 headY -= 20;
@@ -184,10 +187,16 @@ function frame()
                 head.style.left = headX + "px";
             }
 
+            //////////// LOGIC FOR TURNING (END) ///////////////
+            }
+            // We moved a frame and Head has got new position.
 
-
-            if ((headX == foodX) && (headY == foodY))
+            if ((headX == foodX) && (headY == foodY)) 
             {
+                score.innerHTML = "" + bodySize;
+                
+                
+                // Finding new random position for food
                 var positionForNewFoodFound = false;
 
                 while ( !positionForNewFoodFound )
@@ -199,8 +208,8 @@ function frame()
 
                     for (var i = 0; i < bodySize; i++)
                     {
-                        var nthCellX = document.getElementById("cellNumber" + i).style.left;
-                        var nthCellY = document.getElementById("cellNumber" + i).style.top;
+                        var nthCellX = arrayOfCells[i].style.left;
+                        var nthCellY = arrayOfCells[i].style.top;
 
                         if ((foodX + "px" == nthCellX) && (foodY + "px" == nthCellY))
                         {
@@ -209,26 +218,38 @@ function frame()
                         }
                     }
                 }
+
                 food.style.left = foodX + "px";
                 food.style.top = foodY + "px";
 
-                var nthCell = document.createElement("div");
-                nthCell.setAttribute("id", ("cellNumber" + bodySize));
-                nthCell.setAttribute("class", "cell");
-                document.getElementById("container").appendChild( nthCell );
+
+                // Adding new cell to Snake's body
+                var newCell = document.createElement("div");
+                newCell.setAttribute("class", "cell"); // for css and stuff
+                document.getElementById("container").appendChild( newCell );
+
+                arrayOfCells.push( newCell );
 
                 bodySize++;
             }
 
 
             if (bodySize > 1) {
+                
+                var takeNewPositionFromHere = lastPositionOfHead;
+                var putYourOldPositionHere;
+
                 for (var i = 1; i < bodySize; i++) {
-                    var nthCell = document.getElementById("cellNumber" + i);
-                    nthCell.style.top = cellPositionsY[ i-1 ];
-                    nthCell.style.left = cellPositionsX[ i-1 ];
+                    
+                    putYourOldPositionHere = {x: arrayOfCells[i].style.left, y: arrayOfCells[i].style.top};
+
+                    arrayOfCells[i].style.left = takeNewPositionFromHere.x;
+                    arrayOfCells[i].style.top = takeNewPositionFromHere.y;
+
+                    takeNewPositionFromHere = putYourOldPositionHere; // The next cell will take its new position from what the the previous cell has left for it.
+
                 }
             }
         }
     }
-    score.innerHTML = "" + bodySize - 1;
 }
